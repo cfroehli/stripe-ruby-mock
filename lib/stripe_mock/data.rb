@@ -628,6 +628,24 @@ module StripeMock
       }
     end
 
+    def self.mock_sku(params={})
+      currency = params[:currency] || StripeMock.default_currency
+      sku_id = params[:id] || "test_sku_default"
+      {
+        id: sku_id,
+        active: true,
+        price: 1234,
+        currency: currency,
+        inventory: {
+          type: 'infinite'
+        },
+        product: "mock_prod_NONEXIST", # override this with your own existing product id
+        image: '',
+        attributes: {},
+        metadata: {},
+      }.merge(params)
+    end
+
     def self.mock_card_token(params={})
       {
         :id => 'tok_default',

@@ -2,11 +2,32 @@ module StripeMock
   module TestStrategies
     class Base
 
+      def list_skus(limit)
+        Stripe::SKU.list(limit: limit)
+      end
+
+      def create_sku(params={})
+        Stripe::SKU.create create_sku_params(params)
+      end
+
+      def create_sku_params(params={})
+        currency = params[:currency] || StripeMock.default_currency
+        {
+          :id => 'stripe_mock_default_sku_id',
+          :currency => currency,
+          :inventory => {
+            type: 'infinite'
+          },
+          :price => 1234,
+          :product => 'stripe_mock_default_product_id'
+        }.merge(params)
+      end
+
       def list_products(limit)
         Stripe::Product.list(limit: limit)
       end
 
-      def create_product(params = {})
+      def create_product(params={})
         Stripe::Product.create create_product_params(params)
       end
 
@@ -21,7 +42,6 @@ module StripeMock
       def retrieve_product(product_id)
         Stripe::Product.retrieve(product_id)
       end
-
 
       def list_plans(limit)
         Stripe::Plan.list(limit: limit)

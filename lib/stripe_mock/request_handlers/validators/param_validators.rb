@@ -19,9 +19,27 @@ module StripeMock
       end
 
       #
-      # ProductValidator
+      # SKUValidator
       #
 
+      def validate_create_sku_params(params)
+        @base_strategy.create_sku_params.keys.each do |name|
+          raise Stripe::InvalidRequestError.new(missing_param_message(name), name) if params[name].nil?
+        end
+
+        unless %w[finite bucket infinite].include? params[:inventory][:type]
+          raise Stripe::InvalidRequestError.new("Invalid inventory type: must be one of finite, infinite, or bucket", :type)
+        end
+
+        if skus[ params[:id] ]
+          raise Stripe::InvalidRequestError.new(already_exists_message(Stripe::SKU), :id)
+        end
+      end
+
+
+      #
+      # ProductValidator
+      #
 
       def validate_create_product_params(params)
         params[:id] = params[:id].to_s
@@ -37,6 +55,7 @@ module StripeMock
           raise Stripe::InvalidRequestError.new(already_exists_message(Stripe::Product), :id)
         end
       end
+
 
       #
       # PlanValidator

@@ -2,6 +2,20 @@ module StripeMock
   module TestStrategies
     class Live < Base
 
+      def create_sku(params={})
+        params = create_sku_params(params)
+        raise "create_sku requires an :id" if params[:id].nil?
+        delete_sku(params[:id])
+        Stripe::SKU.create params
+      end
+
+      def delete_sku(sku_id)
+        sku = Stripe::SKU.retrieve(sku_id)
+        sku.delete
+      rescue Stripe::StripeError => e
+        # do nothing
+      end
+
       def create_product(params={})
         params = create_product_params(params)
         raise "create_product requires an :id" if params[:id].nil?
